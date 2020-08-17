@@ -6,8 +6,51 @@ import {
   TableHeaderRow,
   TableFixedColumns
 } from "@devexpress/dx-react-grid-material-ui";
+import ScrollContainer from "react-indiana-drag-scroll";
 
-import { generateRows, globalSalesValues } from "../../../demo-data/generator";
+import { generateRows, globalSalesValues } from "./demo-data/generator";
+
+const RowTemplate = (props) => {
+  return (
+    <React.Fragment>
+      <Table.Row
+        style={{
+          width: "100%",
+          height: "16px",
+          border: "1px solid rgba(224, 224, 224, 1)"
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            position: "absolute",
+            background:
+              "linear-gradient(90deg, rgba(0,176,255,1) 0%, rgba(0,176,255,1) 22%, rgba(240,146,14,1) 22%, rgba(240,146,14,1) 77%, rgba(242,220,12,1) 77%, rgba(242,220,12,1) 100%)",
+            zIndex: 301,
+            display: "flex",
+            justifyContent: "flex-end",
+            height: "6px",
+            marginTop: "10px"
+          }}
+        >
+          <div
+            style={{
+              width: `${100 - (props.tableRow.rowId + 1) * 10}%`,
+              background: "rgba(255,255,255,0.8)"
+            }}
+          ></div>
+        </div>
+      </Table.Row>
+      <Table.Row {...props}>{props.children}</Table.Row>
+    </React.Fragment>
+  );
+};
+
+const BodyTemplate = (props) => (
+  <ScrollContainer className="scroll-container">
+    {props.children}
+  </ScrollContainer>
+);
 
 export default () => {
   const [columns] = useState([
@@ -36,48 +79,14 @@ export default () => {
   const [leftColumns] = useState(["region"]);
   const [rightColumns] = useState(["amount"]);
 
-  const RowTemplate = (props) => {
-    return (
-      <React.Fragment>
-        <Table.Row {...props}>{props.children}</Table.Row>
-        <Table.Row
-          style={{
-            width: "100%",
-            height: "26px",
-            border: "1px solid rgba(224, 224, 224, 1)"
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              position: "absolute",
-              background:
-                "linear-gradient(90deg, rgba(0,176,255,1) 0%, rgba(0,176,255,1) 22%, rgba(240,146,14,1) 22%, rgba(240,146,14,1) 77%, rgba(242,220,12,1) 77%, rgba(242,220,12,1) 100%)",
-              zIndex: 301,
-              display: "flex",
-              justifyContent: "flex-end",
-              height: "6px"
-            }}
-          >
-            <div
-              style={{
-                width: `${100 - (props.tableRow.rowId + 1) * 10}%`,
-                background: "rgba(255,255,255,0.8)"
-              }}
-            ></div>
-          </div>
-        </Table.Row>
-      </React.Fragment>
-    );
-  };
-
   return (
-    <div style={{ width: "800px", position: "relative" }}>
-      <Paper>
+    <Paper style={{ width: "800px" }}>
+      <div style={{ position: "relative" }}>
         <Grid rows={rows} columns={columns}>
           <Table
             columnExtensions={tableColumnExtensions}
             rowComponent={RowTemplate}
+            containerComponent={BodyTemplate}
           />
           <TableHeaderRow />
           <TableFixedColumns
@@ -85,7 +94,7 @@ export default () => {
             rightColumns={rightColumns}
           />
         </Grid>
-      </Paper>
-    </div>
+      </div>
+    </Paper>
   );
 };
